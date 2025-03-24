@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Speed Test</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gaugeJS/dist/gauge.min.js"></script>
+</head>
+<body class="default-theme">
+  <div class="container">
+    <h1>Internet Speed Test</h1>
+
+    <div class="theme-select">
+      <label for="themeSelector">Theme:</label>
+      <select id="themeSelector">
+        <option value="default">Radiant Blue</option>
+        <option value="neon">Neon Purple</option>
+        <option value="light">Light</option>
+      </select>
+    </div>
+
+    <button onclick="startSpeedTest()">Start Speed Test</button>
+    <div class="spinner" style="display: none;"></div>
+    <div id="result"></div>
+
+    <canvas id="speedChart" width="400" height="200"></canvas>
+
+    <div class="gauges">
+      <div>
+        <h3>Download</h3>
+        <canvas id="downloadGauge" width="200" height="200"></canvas>
+      </div>
+      <div>
+        <h3>Upload</h3>
+        <canvas id="uploadGauge" width="200" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
