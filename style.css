@@ -1,116 +1,93 @@
 body {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    transition: background 0.5s, color 0.5s;
+    font-family: "Segoe UI", sans-serif;
+    transition: background 0.3s, color 0.3s;
   }
   
-  .container {
-    max-width: 500px;
-    margin: 60px auto;
-    padding: 30px;
-    border-radius: 16px;
+  .hidden { display: none; }
+  
+  header, .controls, .history, .speed-test-container {
     text-align: center;
-    backdrop-filter: blur(10px);
+    margin: 20px;
+  }
+  
+  input, button, select {
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 1rem;
   }
   
   button {
-    padding: 12px 24px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
+    background: #007bff;
+    color: white;
     cursor: pointer;
-    margin: 20px 0;
-    transition: background 0.3s;
   }
   
-  .spinner {
-    width: 40px;
-    height: 40px;
+  button:hover { background: #0056b3; }
+  
+  .go-button {
+    width: 140px;
+    height: 140px;
     margin: 20px auto;
-    border: 5px solid rgba(255,255,255,0.3);
-    border-top: 5px solid #03a9f4;
+    background: #00c9ff;
+    box-shadow: 0 0 15px #00c9ff;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease;
   }
   
-  #result {
-    font-size: 18px;
-    white-space: pre-wrap;
-    margin: 20px 0;
-  }
+  .go-button:hover { transform: scale(1.05); }
   
-  canvas {
-    margin-top: 30px;
-  }
-  
-  .theme-select {
-    margin: 10px 0 20px;
-  }
-  
-  /* Spinner Animation */
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-  
-  /* Default Radiant Blue Theme */
-  body.default-theme {
-    background: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);
-    color: white;
-  }
-  .default-theme .container {
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-  }
-  .default-theme button {
-    background: #03a9f4;
-    color: white;
-  }
-  .default-theme button:hover {
-    background: #0288d1;
-  }
-  
-  /* Neon Purple Theme */
-  body.neon-theme {
-    background: linear-gradient(to bottom right, #2a003f, #4d007d);
-    color: #fff;
-  }
-  .neon-theme .container {
-    background: rgba(255, 255, 255, 0.07);
-    box-shadow: 0 8px 40px rgba(255, 0, 255, 0.2);
-  }
-  .neon-theme button {
-    background: #d500f9;
-    box-shadow: 0 4px 12px rgba(213, 0, 249, 0.4);
-  }
-  .neon-theme button:hover {
-    background: #aa00c7;
-  }
-  
-  /* Light Theme */
-  body.light-theme {
-    background: linear-gradient(to bottom right, #ffffff, #f0f0f0);
-    color: #222;
-  }
-  .light-theme .container {
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  }
-  .light-theme button {
-    background: #2196f3;
-    color: white;
-  }
-  .light-theme button:hover {
-    background: #1e88e5;
-  }
-  .gauges {
+  .results {
     display: flex;
     justify-content: space-around;
-    flex-wrap: wrap;
-    gap: 40px;
-    margin-top: 30px;
+    font-size: 1.5rem;
   }
   
-  .gauges h3 {
-    margin-bottom: 10px;
+  table {
+    margin: 0 auto;
+    max-width: 600px;
+    width: 100%;
+    border-collapse: collapse;
   }
+  
+  th, td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+  }
+  
+  /* Themes */
+  body.blue {
+    background: linear-gradient(135deg, #003973, #e5e5be);
+    color: white;
+  }
+  
+  body.light {
+    background: #f9f9f9;
+    color: #222;
+  }
+  
+  body.light button {
+    background: #222;
+    color: #f9f9f9;
+  }
+  
+  body.dark {
+    background: #121212;
+    color: #ddd;
+  }
+  
+  body.dark button {
+    background: #444;
+    color: #fff;
+  }
+  
+  
   
