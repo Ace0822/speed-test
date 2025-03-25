@@ -6,37 +6,53 @@
   <title>Speed Test</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gaugeJS/dist/gauge.min.js"></script>
 </head>
-<body class="default-theme">
-  <div class="container">
-    <h1>Internet Speed Test</h1>
+<body>
+  <div id="loginView">
+    <h1>Login to Speed Test</h1>
+    <input type="text" id="usernameInput" placeholder="Enter your name" />
+    <button onclick="login()">Login</button>
+  </div>
 
-    <div class="theme-select">
-      <label for="themeSelector">Theme:</label>
-      <select id="themeSelector">
-        <option value="default">Radiant Blue</option>
-        <option value="neon">Neon Purple</option>
+  <div id="dashboardView" class="hidden">
+    <header>
+      <h1>Hi, <span id="usernameDisplay"></span></h1>
+      <button onclick="logout()">Logout</button>
+    </header>
+
+    <div class="controls">
+      <label for="themeSelect">Theme:</label>
+      <select id="themeSelect" onchange="applyTheme(this.value)">
+        <option value="blue">Blue Radiant</option>
         <option value="light">Light</option>
+        <option value="dark">Dark</option>
       </select>
     </div>
 
-    <button onclick="startSpeedTest()">Start Speed Test</button>
-    <div class="spinner" style="display: none;"></div>
-    <div id="result"></div>
-
-    <canvas id="speedChart" width="400" height="200"></canvas>
-
-    <div class="gauges">
-      <div>
-        <h3>Download</h3>
-        <canvas id="downloadGauge" width="200" height="200"></canvas>
+    <div class="speed-test-container">
+      <div class="go-button" id="runTestBtn"><span>GO</span></div>
+      <div class="results">
+        <div><h3>Download</h3><p id="downloadResult">-</p></div>
+        <div><h3>Upload</h3><p id="uploadResult">-</p></div>
       </div>
-      <div>
-        <h3>Upload</h3>
-        <canvas id="uploadGauge" width="200" height="200"></canvas>
-      </div>
+      <canvas id="speedChart" width="400" height="200"></canvas>
     </div>
+
+    <section class="history">
+      <h2>Speed Test History</h2>
+      <table id="historyTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Download</th>
+            <th>Upload</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p>Avg Download: <span id="avgDownload">-</span> Mbps</p>
+      <button onclick="clearHistory()">Clear History</button>
+    </section>
   </div>
 
   <script src="script.js"></script>
