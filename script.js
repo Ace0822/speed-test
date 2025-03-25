@@ -1,125 +1,135 @@
-// Chart.js setup
-const ctx = document.getElementById('speedChart').getContext('2d');
-const speedChart = new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: ['Download', 'Upload'],
-    datasets: [{
-      label: 'Speed (Mbps)',
-      data: [0, 0],
-      backgroundColor: ['#4caf50', '#2196f3']
-    }]
-  },
-  options: {
-    responsive: true,
-    scales: {
-      y: {
-        beginAtZero: true,
-        max: 100
-      }
-    }
+let chart;
+
+function login() {
+  const username = document.getElementById("usernameInput").value.trim();
+  if (username) {
+    localStorage.setItem("user", username);
+    showDashboard();
   }
-});
+}
 
-// Gauge.js setup
-const gaugeOpts = {
-  angle: 0,
-  lineWidth: 0.3,
-  radiusScale: 0.9,
-  pointer: {
-    length: 0.6,
-    strokeWidth: 0.035,
-    color: '#fff'
-  },
-  limitMax: false,
-  limitMin: false,
-  highDpiSupport: true,
-  staticZones: [
-    {strokeStyle: "#4caf50", min: 0, max: 20},
-    {strokeStyle: "#ffc107", min: 20, max: 50},
-    {strokeStyle: "#f44336", min: 50, max: 100}
-  ],
-  staticLabels: {
-    font: "12px sans-serif",
-    labels: [0, 10, 20, 50, 100],
-    color: "#fff",
-    fractionDigits: 0
-  },
-  renderTicks: {
-    divisions: 5,
-    divWidth: 1.1,
-    divLength: 0.7,
-    divColor: "#fff"
-  }
-};
+function logout() {
+  localStorage.removeItem("user");
+  location.reload();
+}
 
-const downloadGauge = new Gauge(document.getElementById("downloadGauge")).setOptions(gaugeOpts);
-downloadGauge.maxValue = 100;
-downloadGauge.setMinValue(0);
-downloadGauge.animationSpeed = 32;
-downloadGauge.set(0);
+function showDashboard() {
+  document.getElementById("loginView").classList.add("hidden");
+  document.getElementById("dashboardView").classList.remove("hidden");
+  document.getElementById("usernameDisplay").textContent = localStorage.getItem("user");
 
-const uploadGauge = new Gauge(document.getElementById("uploadGauge")).setOptions(gaugeOpts);
-uploadGauge.maxValue = 100;
-uploadGauge.setMinValue(0);
-uploadGauge.animationSpeed = 32;
-uploadGauge.set(0);
+  const savedTheme = localStorage.getItem("theme") || "blue";
+  applyTheme(savedTheme);
+  document.getElementById("themeSelect").value = savedTheme;
+  loadHistory();
+  initChart();
+}
 
-// Theme switching
-const themeSelector = document.getElementById('themeSelector');
-themeSelector.addEventListener('change', () => {
-  document.body.className = `${themeSelector.value}-theme`;
-});
+function applyTheme(theme) {
+  document.body.className = theme;
+  localStorage.setItem("theme", theme);
+}
 
-// Speed Test
-function startSpeedTest() {
-  const spinner = document.querySelector('.spinner');
-  const result = document.getElementById('result');
-  spinner.style.display = 'block';
-  result.textContent = '';
+async function startSpeedTest() {
+  document.getElementById("downloadResult").textContent = "Testing...";
+  document.getElementById("uploadResult").textContent = "Testing...";
 
-  // Download Test
-  const downloadTest = new Promise((resolve) => {
+  const download = await testDownloadSpeed();
+  const upload = await testUploadSpeed();
+
+  document.getElementById("downloadResult").textContent = `${download} Mbps`;
+  document.getElementById("uploadResult").textContent = `${upload} Mbps`;
+
+  updateChart(download, upload);
+  saveResult(download, upload);
+}
+
+function testDownloadSpeed() {
+  return new Promise((resolve) => {
     const image = new Image();
-    const imageSizeInBytes = 5 * 1024 * 1024; // ~5 MB
-    const startTime = new Date().getTime();
+    const startTime = Date.now();
+    const size = 5 * 1024 * 1024;
+
     image.onload = () => {
-      const endTime = new Date().getTime();
-      const duration = (endTime - startTime) / 1000;
-      const bitsLoaded = imageSizeInBytes * 8;
-      const speedMbps = (bitsLoaded / duration / (1024 * 1024)).toFixed(2);
-      resolve(Number(speedMbps));
+      const duration = (Date.now() - startTime) / 1000;
+      const speed = ((size * 8) / duration / 1024 / 1024).toFixed(2);
+      resolve(speed);
     };
-    image.onerror = () => resolve(0); // If fails, return 0
-    image.src = "https://upload.wikimedia.org/wikipedia/commons/3/3f/Fronalpstock_big.jpg?nnn=" + Math.random();
-  });
 
-  // Upload Test
-  const uploadTest = new Promise((resolve) => {
-    const dataSize = 2 * 1024 * 1024; // 2 MB
-    const data = new Blob([new Uint8Array(dataSize)]);
-    const startTime = new Date().getTime();
-    fetch("https://httpbin.org/post", {
-      method: "POST",
-      body: data,
-    }).then(() => {
-      const endTime = new Date().getTime();
-      const duration = (endTime - startTime) / 1000;
-      const bitsUploaded = dataSize * 8;
-      const speedMbps = (bitsUploaded / duration / (1024 * 1024)).toFixed(2);
-      resolve(Number(speedMbps));
-    }).catch(() => resolve(0));
-  });
-
-  // Run both
-  Promise.all([downloadTest, uploadTest]).then(([downloadSpeed, uploadSpeed]) => {
-    spinner.style.display = 'none';
-    result.textContent = `Download Speed: ${downloadSpeed} Mbps\nUpload Speed: ${uploadSpeed} Mbps`;
-
-    speedChart.data.datasets[0].data = [downloadSpeed, uploadSpeed];
-    speedChart.update();
-
-    downloadGauge.set(downloadSpeed);
-    uploadGauge.set(uploadSpeed);
+    image.onerror = () => resolve("0");
+    image.src = `https://upload.wikimedia.org/wikipedia/commons/3/3f/Fronalpstock_big.jpg?${Math.random()}`;
   });
 }
+
+async function testUploadSpeed() {
+  const size = 2 * 1024 * 1024;
+  const data = new Blob([new Uint8Array(size)]);
+  const start = Date.now();
+  await fetch("https://httpbin.org/post", { method: "POST", body: data });
+  const duration = (Date.now() - start) / 1000;
+  const speed = ((size * 8) / duration / 1024 / 1024).toFixed(2);
+  return speed;
+}
+
+function saveResult(download, upload) {
+  const record = { date: new Date().toLocaleString(), download, upload };
+  let history = JSON.parse(localStorage.getItem("speedHistory")) || [];
+  history.unshift(record);
+  if (history.length > 10) history = history.slice(0, 10);
+  localStorage.setItem("speedHistory", JSON.stringify(history));
+  loadHistory();
+}
+
+function loadHistory() {
+  const table = document.querySelector("#historyTable tbody");
+  const avgEl = document.getElementById("avgDownload");
+  table.innerHTML = "";
+  const history = JSON.parse(localStorage.getItem("speedHistory")) || [];
+  let total = 0;
+
+  history.forEach((r) => {
+    total += parseFloat(r.download);
+    table.innerHTML += `<tr><td>${r.date}</td><td>${r.download} Mbps</td><td>${r.upload} Mbps</td></tr>`;
+  });
+
+  avgEl.textContent = history.length ? (total / history.length).toFixed(2) : "-";
+}
+
+function clearHistory() {
+  localStorage.removeItem("speedHistory");
+  loadHistory();
+}
+
+function initChart() {
+  const ctx = document.getElementById("speedChart").getContext("2d");
+  chart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["Download", "Upload"],
+      datasets: [
+        {
+          label: "Speed (Mbps)",
+          data: [0, 0],
+          backgroundColor: ["#4bc0c0", "#ff6384"],
+        },
+      ],
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true, suggestedMax: 100 },
+      },
+    },
+  });
+}
+
+function updateChart(download, upload) {
+  chart.data.datasets[0].data = [download, upload];
+  chart.update();
+}
+
+window.onload = () => {
+  const user = localStorage.getItem("user");
+  if (user) showDashboard();
+  const btn = document.getElementById("runTestBtn");
+  if (btn) btn.addEventListener("click", startSpeedTest);
+};
