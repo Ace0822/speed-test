@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Settings</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="settings-wrapper">
+    <h2>⚙️ Settings</h2>
+
+    <label>
+      Preferred Unit:
+      <select id="unitSelect">
+        <option value="Mbps">Mbps</option>
+        <option value="Kbps">Kbps</option>
+      </select>
+    </label>
+
+    <label>
+      <input type="checkbox" id="autoClear" />
+      Auto-clear history on login
+    </label>
+
+    <button onclick="saveSettings()">Save</button>
+    <a href="index.html">← Back to Dashboard</a>
+  </div>
+
+  <script>
+    const unitSelect = document.getElementById('unitSelect');
+    const autoClear = document.getElementById('autoClear');
+
+    window.onload = () => {
+      unitSelect.value = localStorage.getItem('unit') || 'Mbps';
+      autoClear.checked = localStorage.getItem('autoClear') === 'true';
+    };
+
+    function saveSettings() {
+      localStorage.setItem('unit', unitSelect.value);
+      localStorage.setItem('autoClear', autoClear.checked);
+      alert('Settings saved!');
+    }
+  </script>
+</body>
+</html>
